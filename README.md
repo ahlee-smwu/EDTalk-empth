@@ -124,6 +124,36 @@ Download the [checkpoints](https://drive.google.com/file/d/1EKJXpq5gwFaRfkiAs6YU
   # example:
   python demo_EDTalk_A_using_predefined_exp_weights.py --source_path res/results_by_facesr/demo_EDTalk_A.png --audio_driving_path test_data/mouth_source.wav --pose_driving_path test_data/pose_source1.mp4 --exp_type angry --save_path res/demo_EDTalk_A_using_weights.mp4
   ```
+
+  <details>
+  <summary><b>How --exp_type works (how predefined expression weights are obtained)</b></summary>
+
+  The `--exp_type` argument (e.g., `angry`) loads a precomputed 10-dimensional expression coefficient vector from `ckpts/predefined_exp_weights/{exp_type}.npy`. Available options: `angry`, `contempt`, `disgusted`, `fear`, `happy`, `sad`, `surprised`, `neutral`.
+
+  **How these weights were generated:**
+
+  During training, EDTalk learns to decompose facial motion into three disentangled latent spaces — mouth (20-dim), head pose (6-dim), and expression (10-dim). The expression coefficients are produced by the `exp_fc` network inside the Generator:
+
+  ```
+  Encoder → style vector (512-d) → shared FC → exp_fc → alpha_D_exp (10-d)
+  ```
+
+  To obtain the predefined weights, we ran inference on the emotion-labeled [MEAD dataset](https://wywu.github.io/projects/MEAD/MEAD.html), extracted the 10-dim `alpha_D_exp` for all frames of each emotion category, and averaged them. The resulting mean vector per emotion was saved as a `.npy` file.
+
+  At inference time, these 10-dim coefficients are concatenated with lip (20-dim) and pose (6-dim) coefficients, then projected through the `Direction_exp` module's learned orthogonal basis (via QR decomposition) to produce a 512-dim expression latent vector used for final face synthesis.
+
+  **To extract weights yourself (e.g., for custom emotions or fine-tuned models):**
+
+  ```bash
+  python extract_predefined_exp_weights.py \
+    --model_path ckpts/EDTalk.pt \
+    --data_root /path/to/MEAD_front/crop_frame \
+    --save_dir ckpts/predefined_exp_weights
+  ```
+
+  See [extract_predefined_exp_weights.py](extract_predefined_exp_weights.py) for full details.
+  </details>
+
   ****
 
 |  |           |         |

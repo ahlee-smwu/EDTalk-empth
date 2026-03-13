@@ -150,6 +150,10 @@ class Demo(nn.Module):
            
         self.audio_path = args.audio_driving_path
 
+        # Load predefined expression weight vector for the specified emotion (e.g., "angry").
+        # Each .npy file contains a (1, 10) expression coefficient vector, extracted by averaging
+        # the trained exp_fc network's output over MEAD dataset frames per emotion.
+        # See extract_predefined_exp_weights.py and README.md for details.
         self.exp_vid_target = np.load(os.path.join('ckpts/predefined_exp_weights', args.exp_type+'.npy'))
         self.exp_vid_target = torch.from_numpy(self.exp_vid_target).cuda()
 
