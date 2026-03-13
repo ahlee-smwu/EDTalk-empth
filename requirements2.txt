@@ -1,0 +1,23 @@
+# Python 3.8용 권장 requirements
+
+numpy==1.22.4
+tqdm==4.66.4
+imageio-ffmpeg==0.5.1
+moviepy==1.0.3
+
+# PyAV 9.2.0 빌드 충돌 회피
+Cython<3
+av==9.2.0
+
+# audio
+numba==0.56.4
+librosa==0.8.0
+
+# face / restoration
+basicsr==1.4.2
+facexlib==0.3.0
+gfpgan==1.3.8
+realesrgan==0.3.0
+
+# app
+gradio==3.50.2
